@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+message User {
+    int32 id = 1;
+    string username = 2;
+}
+
+message Post {
+    int32 id = 1;
+    string title = 2;
+    string body = 3;
+    string url = 4;
+    int32 score = 5;
+    PostState state = 6;
+    string date = 7;
+    int32 user_id = 8;
+    repeated Comment comments = 9;
+    int32 subreddit_id = 10;
+}
+
+message Comment {
+    int32 id = 1;
+    string body = 2;
+    int32 score = 3;
+    int32 state = 4;
+    string date = 5;
+    User user = 6;
+    int32 post_id = 7;
+    int32 parent_id = 8;
+    // repeated Comment comments = 9;
+}
+
+message Subreddit {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    repeated string tags = 4;
+}
+
+// subreddit state
+enum SubredditState {
+    SUBREDDIT_PUBLIC = 0;
+    SUBREDDIT_PRIVATE = 1;
+    SUBREDDIT_HIDDEN = 2;
+}
+
+// post state
+enum PostState {
+    POST_NORMAL = 0;
+    POST_HIDDEN = 1;
+    POST_LOCKED = 2;
+}
+
+// comment state
+enum CommentState {
+    COMMENT_NORMAL = 0;
+    COMMENT_HIDDEN = 1;
+}
+
+service Reddit {
+    // create a post
+    rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {};
+
+    // Upvote or downvote a post
+    rpc VotePost(VotePostRequest) returns (VotePostResponse) {};
+
+    // retrieve post content
+    rpc GetPost(GetPostRequest) returns (GetPostResponse) {};
+
+    // create a comment
+    rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {};
+
+    // upvote or downvote a comment
+    rpc VoteComment(VoteCommentRequest) returns (VoteCommentResponse) {};
+
+    // retrieve N mostupvoted comments under a post
+    rpc GetMostUpvotedNComments(GetMostUpvotedNCommentsRequest) returns (GetMostUpvotedNCommentsResponse) {};
+
+    // expand a comment branch
+    rpc ExpandCommentBranch(ExpandCommentBranchRequest) returns (ExpandCommentBranchResponse) {};
+}
+
+// request message for create post
+message CreatePostRequest {
+    string title = 1;
+    string body = 2;
+    string url = 3;
+    int32 score = 4;
+    int32 state = 5;
+    string date = 6;
+    int32 user_id = 7;
+}
+
+// response message for create post
+message CreatePostResponse {
+    int32 id = 1;
+}
+
+// request message for upvote or downvote a post
+message VotePostRequest {
+    int32 id = 1;
+    int32 score = 2;
+}
+
+// response message for upvote or downvote a post
+message VotePostResponse {
+    bool success = 1;
+    int32 score = 2;
+}
+
+// request message for retrieving post content
+message GetPostRequest {
+    int32 id = 1;
+}
+
+// response message for retrieving post content
+message GetPostResponse {
+    Post post = 1;
+}
+
+// request message for create a comment
+message CreateCommentRequest {
+    string body = 1;
+    int32 score = 2;
+    int32 state = 3;
+    string date = 4;
+    int32 user_id = 5;
+    int32 post_id = 6;
+    int32 parent_id = 7;
+}
+
+// response message for create a comment
+message CreateCommentResponse {
+    bool success = 1;
+    int32 id = 2;
+}
+
+// request message for upvote or downvote a comment
+message VoteCommentRequest {
+    int32 id = 1;
+    int32 score = 2;
+}
+
+// response message for upvote or downvote a comment
+message VoteCommentResponse {
+    bool success = 1;
+    int32 score = 2;
+}
+
+// request message for retrieving N most upvoted comments under a post
+message GetMostUpvotedNCommentsRequest {
+    int32 post_id = 1;
+    int32 n = 2;
+}
+
+// response message for retrieving N most upvoted comments under a post
+message GetMostUpvotedNCommentsResponse {
+    repeated Comment comments = 1;
+}
+
+//request message for expanding a comment branch
+message ExpandCommentBranchRequest {
+    int32 comment_id = 1;
+    int32 n = 2;
+}
+
+//response message for expanding a comment branch
+message ExpandCommentBranchResponse {
+    repeated Comment first_level = 1;
+    repeated Comment second_level = 2;
+}
