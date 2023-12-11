@@ -1,5 +1,4 @@
 import sys
-import time
 sys.path.append("../")
 
 import reddit_pb2 as reddit_pb2
