@@ -1,4 +1,5 @@
 import sys
+import time
 sys.path.append("../")
 
 import reddit_pb2 as reddit_pb2
@@ -46,7 +47,6 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
             self.query_db("INSERT INTO posts (title, body, url, score, state, date, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (title, body, url, score, state, date, user_id))
 
             response = self.query_db("SELECT * FROM posts ORDER BY id DESC LIMIT 1;")
-            print(response)
 
             return reddit_pb2.CreatePostResponse(id=response[0])
         except Exception as e:
@@ -87,7 +87,7 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
                     parent_id=comment[7]
                 )
                 comments.append(c)
-            print(response[4], response[5])
+
             post = reddit_pb2.Post(
                 id=int(response[0]), 
                 title=response[1], 
@@ -100,7 +100,7 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
                 comments=comments,
                 subreddit_id=int(response[8])
             )
-            print(post)
+
             return reddit_pb2.GetPostResponse(post=post)
         except Exception as e:
             print(f"Error retrieving post: {e}")
@@ -153,7 +153,6 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
             result = reddit_pb2.GetMostUpvotedNCommentsResponse()
             for row in response:
                 user = self.query_db("SELECT * FROM users WHERE id = ?", (row[5],))
-                print(row)
                 user1 = reddit_pb2.User(id=user[0], username=user[1])
                 comment = reddit_pb2.Comment(
                     id=int(row[0]),
@@ -230,8 +229,30 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
     
     ## Extra Credit
     # Monitor updates - client initiates the call with a post, with ability to add comment IDs later in a stream.
-    # def MonitorUpdates(self, request, context):
-    #     post = request.post
-    #     comment_ids = request.comment_ids
+    def MonitorUpdates(self, request_iterator, context):
+        for request in request_iterator:
+            if request.post_id:
+                post_id = request.post_id
+                post_score = self.fetch_post_score(post_id)
+                yield reddit_pb2.MonitorUpdatesResponse(id=post_id, score=post_score)
+            if request.comment_ids:
+                comment_ids = request.comment_ids
+                for comment_id in comment_ids:
+                    comment_score = self.fetch_comment_score(comment_id)
+                    yield reddit_pb2.MonitorUpdatesResponse(id=comment_id, score=comment_score)
 
-    #     while
+    def fetch_post_score(self, post_id):
+        try:
+            score = self.query_db("SELECT score FROM posts WHERE id = ?", (post_id,))
+            return score[0]
+        except Exception as e:
+            print(f"Error retrieving post score: {e}")
+            return 0
+    
+    def fetch_comment_score(self, id):
+        try:
+            score = self.query_db("SELECT score FROM comments WHERE id = ?", (id,))
+            return score[0]
+        except Exception as e:
+            print(f"Error retrieving comment scores: {e}")
+            return 0

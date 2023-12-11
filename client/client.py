@@ -40,6 +40,22 @@ class RedditClient:
         response = self.stub.ExpandCommentBranch(reddit_pb2.ExpandCommentBranchRequest(comment_id=comment_id, n=n))
         return response
 
+
+    # Extra credit - monitor updates
+    def monitor_updates(self, post_id, comment_ids):
+        
+        def request_iterator():
+            yield reddit_pb2.MonitorUpdatesRequest(post_id=post_id)
+
+            yield reddit_pb2.MonitorUpdatesRequest(comment_ids=comment_ids)
+            
+        response = self.stub.MonitorUpdates(request_iterator())
+
+        for update in response:
+            print(update)
+            
+
+
 if __name__ == "__main__":
     client = RedditClient("localhost", 50051)
-    print(client.get_post(1))
+    print(client.monitor_updates(1, [1, 2, 3]))

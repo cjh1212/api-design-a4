@@ -27,7 +27,6 @@ message Comment {
     User user = 6;
     int32 post_id = 7;
     int32 parent_id = 8;
-    // repeated Comment comments = 9;
 }
 
 message Subreddit {
@@ -78,6 +77,21 @@ service Reddit {
 
     // expand a comment branch
     rpc ExpandCommentBranch(ExpandCommentBranchRequest) returns (ExpandCommentBranchResponse) {};
+
+    // extra credit - monitor updates
+    rpc MonitorUpdates(stream MonitorUpdatesRequest) returns (stream MonitorUpdatesResponse) {};
+}
+
+// extra credit - request message for monitor updates
+message MonitorUpdatesRequest {
+    int32 post_id = 1;
+    repeated int32 comment_ids = 2;
+}
+
+// extra credit - response message for monitor updates
+message MonitorUpdatesResponse {
+    int32 id = 1;
+    int32 score = 2;
 }
 
 // request message for create post

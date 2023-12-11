@@ -49,6 +49,11 @@ class RedditStub(object):
                 request_serializer=reddit__pb2.ExpandCommentBranchRequest.SerializeToString,
                 response_deserializer=reddit__pb2.ExpandCommentBranchResponse.FromString,
                 )
+        self.MonitorUpdates = channel.stream_stream(
+                '/Reddit/MonitorUpdates',
+                request_serializer=reddit__pb2.MonitorUpdatesRequest.SerializeToString,
+                response_deserializer=reddit__pb2.MonitorUpdatesResponse.FromString,
+                )
 
 
 class RedditServicer(object):
@@ -103,6 +108,13 @@ class RedditServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def MonitorUpdates(self, request_iterator, context):
+        """extra credit - monitor updates
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RedditServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -140,6 +152,11 @@ def add_RedditServicer_to_server(servicer, server):
                     servicer.ExpandCommentBranch,
                     request_deserializer=reddit__pb2.ExpandCommentBranchRequest.FromString,
                     response_serializer=reddit__pb2.ExpandCommentBranchResponse.SerializeToString,
+            ),
+            'MonitorUpdates': grpc.stream_stream_rpc_method_handler(
+                    servicer.MonitorUpdates,
+                    request_deserializer=reddit__pb2.MonitorUpdatesRequest.FromString,
+                    response_serializer=reddit__pb2.MonitorUpdatesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -267,5 +284,22 @@ class Reddit(object):
         return grpc.experimental.unary_unary(request, target, '/Reddit/ExpandCommentBranch',
             reddit__pb2.ExpandCommentBranchRequest.SerializeToString,
             reddit__pb2.ExpandCommentBranchResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def MonitorUpdates(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/Reddit/MonitorUpdates',
+            reddit__pb2.MonitorUpdatesRequest.SerializeToString,
+            reddit__pb2.MonitorUpdatesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
