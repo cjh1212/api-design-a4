@@ -5,6 +5,17 @@ message User {
     string username = 2;
 }
 
+message Comment {
+    int32 id = 1;
+    string body = 2;
+    int32 score = 3;
+    int32 state = 4;
+    string date = 5;
+    User user = 6;
+    int32 post_id = 7;
+    int32 parent_id = 8;
+}
+
 message Post {
     int32 id = 1;
     string title = 2;
@@ -16,17 +27,6 @@ message Post {
     int32 user_id = 8;
     repeated Comment comments = 9;
     int32 subreddit_id = 10;
-}
-
-message Comment {
-    int32 id = 1;
-    string body = 2;
-    int32 score = 3;
-    int32 state = 4;
-    string date = 5;
-    User user = 6;
-    int32 post_id = 7;
-    int32 parent_id = 8;
 }
 
 message Subreddit {
@@ -103,6 +103,7 @@ message CreatePostRequest {
     int32 state = 5;
     string date = 6;
     int32 user_id = 7;
+    int32 subreddit_id = 8;
 }
 
 // response message for create post

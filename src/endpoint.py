@@ -39,11 +39,11 @@ class Reddit(reddit_pb2_grpc.RedditServicer):
         state = request.state
         date = request.date
         user_id = request.user_id
-        # self.post_id += 1
+        subreddit_id = request.subreddit_id
 
         # insert into database
         try:
-            self.query_db("INSERT INTO posts (title, body, url, score, state, date, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)", (title, body, url, score, state, date, user_id))
+            self.query_db("INSERT INTO posts (title, body, url, score, state, date, user_id, subreddit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (title, body, url, score, state, date, user_id, subreddit_id))
 
             response = self.query_db("SELECT * FROM posts ORDER BY id DESC LIMIT 1;")
 

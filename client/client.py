@@ -11,7 +11,7 @@ class RedditClient:
         self.channel = grpc.insecure_channel(f"{host}:{port}")
         self.stub = reddit_pb2_grpc.RedditStub(self.channel)
     
-    def create_post(self, title, body, url, score, state, date, user_id):
+    def create_post(self, title, body, url, score, state, date, user_id, subreddit_id):
         response = self.stub.CreatePost(reddit_pb2.CreatePostRequest(title=title, body=body, url=url, score=score, state=state, date=date, user_id=user_id))
         return response
     
@@ -57,5 +57,6 @@ class RedditClient:
 
 
 if __name__ == "__main__":
-    client = RedditClient("localhost", 50051)
-    print(client.monitor_updates(1, [1, 2, 3]))
+    # client = RedditClient("localhost", 50051)
+    # print(client.monitor_updates(1, [1, 2, 3]))
+    pass
